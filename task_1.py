@@ -18,7 +18,7 @@ def uniform_cost_search(g, dist, source, sink):
   while not pq.empty():
     pair = pq.get()
 
-    current_path = pair[1]
+    current_distance, current_path = pair[0], pair[1]
 
     # current node will be the last node in the path taken
     current_node = current_path[-1]
@@ -48,10 +48,10 @@ def uniform_cost_search(g, dist, source, sink):
         dist_json_key = current_node + "," + adjacent_node
         dist_to_adjacent_node = dist[dist_json_key]
 
-        total_distance = pair[0] + dist_to_adjacent_node
-        full_path = list(pair[1])
+        total_distance = current_distance + dist_to_adjacent_node
+        full_path = list(current_path)
         full_path.append(adjacent_node)
         pq.put((total_distance, full_path))
 
   return PathDetailsWithNoConstraint()
-#endof uniform cost search
+#endof uniform cost search with no constraint
