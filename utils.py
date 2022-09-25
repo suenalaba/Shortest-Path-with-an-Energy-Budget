@@ -1,6 +1,6 @@
 import json
 from constants import LINE_DELIMITER
-from path_properties import PathDetailsWithNoConstraint
+from path_properties import PathDetailsWithNoConstraint, PathDetailsWithConstraint
 
 def open_json_data():
 
@@ -29,4 +29,12 @@ def print_results_no_constraints(taskNumber, path_details: PathDetailsWithNoCons
   print("Shortest path: " + path_details.path_desc + ".")
   print("Shortest distance: " + str(path_details.path_length) + ".")
 
+def print_results_with_constraints(taskNumber, path_details: PathDetailsWithConstraint):
+  print(LINE_DELIMITER)
+  print(taskNumber + " results: ")
+  print(LINE_DELIMITER + "\n")
+  print("Shortest path: " + path_details.path_desc + ".")
+  print("Shortest distance: " + str(path_details.path_length) + ".")
+  print("Total energy cost: " + str(path_details.energy_cost) + ".")
+  
 

@@ -5,6 +5,14 @@ class PathDetailsWithNoConstraint:
     self.path_length = path_length
     self.path_desc = path_desc
 
+class PathDetailsWithConstraint:
+
+  def __init__(self, path_length = -1, path_desc="Path cannot be determined", energy_cost = -1):
+
+    self.path_length = path_length
+    self.path_desc = path_desc
+    self.energy_cost = energy_cost
+
 
 def get_path_length(dist, path):
 
@@ -23,3 +31,21 @@ def get_path_length(dist, path):
       prevNode = node
 
   return total_path_length
+
+def get_path_energy_cost(cost, path):
+
+  total_energy_consumed = 0
+  start_flag = True
+
+  for node in path:
+    if start_flag:
+      prevNode = node
+      start_flag = False
+    else:
+      currNode = node
+      nodes_key = prevNode + "," + currNode
+      energy_cost_between_nodes = cost[nodes_key]
+      total_energy_consumed += energy_cost_between_nodes
+      prevNode = node
+
+  return total_energy_consumed
