@@ -1,51 +1,21 @@
-class PathDetailsWithNoConstraint:
+# this function builds the path by backtracking from destination node, using the parent variable
+def get_printable_path(destination_node):
+  
+  path_str = ""
+  path_list = []
 
-  def __init__(self, path_length = -1, path_desc="Path cannot be determined"):
+  current_node = destination_node
 
-    self.path_length = path_length
-    self.path_desc = path_desc
+  while current_node is not None:
+    
+    # parent should appear in front of child in the path.
+    # hence, we insert to front of list each time.
+    path_list.insert(0, current_node.node_id) 
 
-class PathDetailsWithConstraint:
+    # update current node to be parent
+    current_node = current_node.parent
+  
+  # get the path string required
+  path_str = '->'.join(path_list)
 
-  def __init__(self, path_length = -1, path_desc="Path cannot be determined", energy_cost = -1):
-
-    self.path_length = path_length
-    self.path_desc = path_desc
-    self.energy_cost = energy_cost
-
-
-def get_path_length(dist, path):
-
-  total_path_length = 0
-  start_flag = True
-
-  for node in path:
-    if start_flag:
-      prevNode = node
-      start_flag = False
-    else:
-      currNode = node
-      nodes_key = prevNode + "," + currNode
-      distance_between_nodes = dist[nodes_key]
-      total_path_length += distance_between_nodes
-      prevNode = node
-
-  return total_path_length
-
-def get_path_energy_cost(cost, path):
-
-  total_energy_consumed = 0
-  start_flag = True
-
-  for node in path:
-    if start_flag:
-      prevNode = node
-      start_flag = False
-    else:
-      currNode = node
-      nodes_key = prevNode + "," + currNode
-      energy_cost_between_nodes = cost[nodes_key]
-      total_energy_consumed += energy_cost_between_nodes
-      prevNode = node
-
-  return total_energy_consumed
+  return path_str

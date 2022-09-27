@@ -14,8 +14,8 @@
 
 ## List of contributors
 
-| Name       |              Github Profile               |
-| ---------- | :---------------------------------------: |
-| Joshua     | [suenalaba](https://github.com/suenalaba) |
-| Shein Htet |           [toupdate](to update)           |
-| Zhi Kai    |    [zkai99](https://github.com/zkai99)    |
+| Name       |                   Github Profile                    |
+| ---------- | :-------------------------------------------------: |
+| Joshua     |      [suenalaba](https://github.com/suenalaba)      |
+| Shein Htet | [sheinhtetsai99](https://github.com/sheinhtetsai99) |
+| Zhi Kai    |         [zkai99](https://github.com/zkai99)         |

@@ -1,57 +1,71 @@
 from queue import PriorityQueue
+import sys
+from Node import Node
+from utils import get_json_dict_key
 
-from path_properties import PathDetailsWithNoConstraint, get_path_length
 
+def uniform_cost_search_no_constraint(g, dist, cost, source_id, destination_id):
 
-def uniform_cost_search(g, dist, source, sink):
+  pq = PriorityQueue() # by default Python implements a min pq
 
-  # use priority queue to get the current shortest path
-  pq = PriorityQueue()
+  dist_dict = {} # stores k:v pair of {node_id: distance from source}
+  dist_dict[source_id] = 0 
 
-  # maintain a set of visited nodes so we don't revisit nodes already traversed
-  visited = []
+  visited = [] # marker to indicate whether a node has been visited, stores actual node
 
-  initial_path = [source]
+  # source node has no parent node
+  source = Node(source_id, 0, 0, None)
 
-  pq.put((0, initial_path))
+  pq.put(source)
 
   while not pq.empty():
-    pair = pq.get()
 
-    current_distance, current_path = pair[0], pair[1]
+    current_node = pq.get()
 
-    # current node will be the last node in the path taken
-    current_node = current_path[-1]
-    # if already visited, don't do anything
     if current_node in visited:
       continue
-    # explore node that has yet to be visited
-    else:
+    
+    # NOTE: We only do goal test when we expand node not when we add to frontier
+    if current_node.node_id == destination_id:
+      return current_node
 
-      visited.append(current_node)
+    # mark node as visited
+    visited.append(current_node)
 
-      # return path taken if current node is sink, note we only do goal test on node when we expand it
-      if sink == current_node:
-        # get description of the shortest path in a printable format
-        shortest_path = ""
-        for node in current_path:
-          shortest_path += node + "->"
-        shortest_path = shortest_path[:-2]
+    for adjacent_node_id in g[current_node.node_id]:
 
-        shortest_path_length = get_path_length(dist, current_path)
+      # new distance = distance to current node + edgelength(curr,adjacent)
+      dist_dict_key = get_json_dict_key(current_node.node_id, adjacent_node_id)
+      new_distance = current_node.distance + dist[dist_dict_key]
 
-        path_details = PathDetailsWithNoConstraint(shortest_path_length, shortest_path)
+      # we only want to add node to PQ if it has a shorter distance
+      if new_distance < dist_dict.get(adjacent_node_id, sys.maxsize):
 
-        return path_details
-      # add paths for adjacent nodes into pq
-      for adjacent_node in g[current_node]:
-        dist_json_key = current_node + "," + adjacent_node
-        dist_to_adjacent_node = dist[dist_json_key]
+        # update dist_dict
+        dist_dict[adjacent_node_id] = new_distance
 
-        total_distance = current_distance + dist_to_adjacent_node
-        full_path = list(current_path)
-        full_path.append(adjacent_node)
-        pq.put((total_distance, full_path))
+        # update energy cost
+        # this is trivial for the unconstrained uniform cost search
+        cost_dict_key = get_json_dict_key(current_node.node_id, adjacent_node_id)
+        new_energy_cost = current_node.energy_cost + cost[cost_dict_key]
 
-  return PathDetailsWithNoConstraint()
-#endof uniform cost search with no constraint
+        # add node to frontier
+        adjacent_node = Node(adjacent_node_id, new_distance, new_energy_cost, current_node)
+
+        # the pq comparator will be overloaded as defined in Node class.
+        pq.put(adjacent_node)
+
+  # if path not found we return none. But for this specific instance, this should never happen.
+  return None
+
+#endof uniform cost search with no constraint satisfaction
+
+
+
+
+    
+
+    
+
+
+

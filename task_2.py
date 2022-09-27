@@ -1,72 +1,78 @@
 from queue import PriorityQueue
+import sys
+from Node import Node
+from utils import get_json_dict_key
 from constants import ENERGY_BUDGET
-from path_properties import PathDetailsWithConstraint, get_path_length, get_path_energy_cost
 
-def uniform_cost_search_with_constraint(g, dist, cost, source, sink):
+def uniform_cost_search_with_constraint(g, dist, cost, source_id, destination_id):
 
-  # use priority queue to get the current shortest path
-  pq = PriorityQueue()
+  pq = PriorityQueue() # by default Python implements a min pq
 
-  # maintain a set of visited nodes so we don't revisit nodes already traversed
-  visited = []
+  dist_dict = {} # stores k:v pair of {node_id: distance from source}
+  dist_dict[source_id] = 0
 
-  initial_path = [source]
+  cost_dict = {} # stores K:v pair of {node_id: energy cost from source}
+  cost_dict[source_id] = 0 
 
-  pq.put((0, 0, initial_path))
+  #NOTE: This time we have no visited marker because we will ALLOW revisiting.
+  # As there may be more optimal shorter paths within the energy budget.
+  # Non-greedy approach.
+
+  visited = [] # marker to indicate whether a node has been visited, stores actual node
+
+  # source node has no parent node
+  source = Node(source_id, 0, 0, None)
+
+  pq.put(source)
 
   while not pq.empty():
-    pair = pq.get()
 
-    current_distance, energy_consumed, current_path = pair[0], pair[1], pair[2]
+    current_node = pq.get()
+    
+    # NOTE: We only do goal test when we expand node not when we add to frontier
+    if current_node.node_id == destination_id and current_node.energy_cost <= ENERGY_BUDGET:
+      return current_node
 
-    # current node will be the last node in the path taken
-    current_node = current_path[-1]
+    for adjacent_node_id in g[current_node.node_id]:
 
-    # if already visited, don't do anything
-    if current_node in visited:
-      continue
-    # explore node that has yet to be visited
-    else:
+      # check to ensure energy cost is within budget (CSP).
+      cost_dict_key = get_json_dict_key(current_node.node_id, adjacent_node_id)
+      new_energy_cost = current_node.energy_cost + cost[cost_dict_key]
 
-      visited.append(current_node)
-
-      # return path taken if current node is sink, note we only do goal test on node when we expand it
-      if sink == current_node:
-        # get description of the shortest path in a printable format
-        shortest_path = ""
-        for node in current_path:
-          shortest_path += node + "->"
-        shortest_path = shortest_path[:-2]
-
-        # get total length of path from source to sink
-        shortest_path_length = get_path_length(dist, current_path)
-
-        # get total energy cost of path from source to sink
-        total_energy_cost = get_path_energy_cost(cost, current_path)
-
-        path_details = PathDetailsWithConstraint(shortest_path_length, shortest_path, total_energy_cost)
-
-        return path_details
+      # if energy budget exceeded, CSP fails.
+      # Optimization: We do not want to waste time searching further,
+      # when constraints have been violated, so backtrack.
+      if ENERGY_BUDGET < new_energy_cost:
+        continue
       
-      # add paths for adjacent nodes into pq
-      for adjacent_node in g[current_node]:
+      # prevent cyclic loop where you go back and forth between the same nodes
+      if current_node.parent != None and current_node.parent.node_id == adjacent_node_id:
+        continue
 
-        cost_json_key = current_node + "," + adjacent_node
-        energy_cost_to_adjacent_node = cost[cost_json_key]
-        total_energy_cost = energy_consumed + energy_cost_to_adjacent_node
+      # new distance = distance to current node + edgelength(curr,adjacent)
+      dist_dict_key = get_json_dict_key(current_node.node_id, adjacent_node_id)
+      new_distance = current_node.distance + dist[dist_dict_key]
 
-        # if total energy cost exceeds the energy budget we don't add this node to pq
-        if total_energy_cost > ENERGY_BUDGET:
-          continue
-        else: 
-          # we only add this new path to pq if it satisfies our energy constraint
-          dist_json_key = current_node + "," + adjacent_node
-          dist_to_adjacent_node = dist[dist_json_key]
-          total_distance = current_distance + dist_to_adjacent_node
+      # we only want to add node to PQ if it has a shorter distance
+      if new_distance < dist_dict.get(adjacent_node_id, sys.maxsize) or new_energy_cost < cost_dict.get(adjacent_node_id, sys.maxsize):
+        
+        # update cost_dict if a more energy efficient path is found
+        if new_energy_cost < cost_dict.get(adjacent_node_id, sys.maxsize):
+          cost_dict[adjacent_node_id] = new_energy_cost
 
-          full_path = list(current_path)
-          full_path.append(adjacent_node)
-          pq.put((total_distance, total_energy_cost, full_path))
+        # update dist_dict if a shorter path is found
+        if dist_dict.get(adjacent_node_id, sys.maxsize):
+          dist_dict[adjacent_node_id] = new_distance
 
-  return PathDetailsWithConstraint()
-#endof uniform cost search with energy cost constraint
+        # add node to frontier
+        adjacent_node = Node(adjacent_node_id, new_distance, new_energy_cost, current_node)
+
+        # the pq comparator will be overloaded as defined in Node class.
+        pq.put(adjacent_node)
+
+  # if path not found we return none. But for this specific instance, this should never happen.
+  return None
+
+#endof uniform cost search with constraint satisfaction
+
+

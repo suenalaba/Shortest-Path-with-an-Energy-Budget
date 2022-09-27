@@ -1,40 +1,39 @@
 import json
-from constants import LINE_DELIMITER
-from path_properties import PathDetailsWithNoConstraint, PathDetailsWithConstraint
+from constants import LINE_DELIMITER, FILE_PATH
 
+# load in data files of JSON format
 def open_json_data():
 
-  with open("G.json", "r") as file:
+  with open(FILE_PATH + "G.json", "r") as file:
     g = json.load(file)
     file.close()
 
-  with open("Dist.json", "r") as file:
+  with open(FILE_PATH + "Dist.json", "r") as file:
     dist = json.load(file)
     file.close()
 
-  with open("Cost.json", "r") as file:
+  with open(FILE_PATH + "Cost.json", "r") as file:
     cost = json.load(file)
     file.close()
 
-  with open("Coord.json", "r") as file:
+  with open(FILE_PATH + "Coord.json", "r") as file:
     coord = json.load(file)
     file.close()
 
   return g, dist, cost, coord
-  
-def print_results_no_constraints(taskNumber, path_details: PathDetailsWithNoConstraint):
-  print(LINE_DELIMITER)
-  print(taskNumber + " results: ")
-  print(LINE_DELIMITER + "\n")
-  print("Shortest path: " + path_details.path_desc + ".")
-  print("Shortest distance: " + str(path_details.path_length) + ".")
 
-def print_results_with_constraints(taskNumber, path_details: PathDetailsWithConstraint):
+# display results in console in format specified.
+def print_results(task_number,full_path_string, total_distance, total_energy_cost):
   print(LINE_DELIMITER)
-  print(taskNumber + " results: ")
+  print(task_number + " results: ")
   print(LINE_DELIMITER + "\n")
-  print("Shortest path: " + path_details.path_desc + ".")
-  print("Shortest distance: " + str(path_details.path_length) + ".")
-  print("Total energy cost: " + str(path_details.energy_cost) + ".")
+  print("Shortest path: " + full_path_string + ".")
+  print("Shortest distance: " + str(total_distance) + ".")
+  print("Total energy cost: " + str(total_energy_cost) + ".")
+
+# getting the json key for both Cost and Dist dictionaries
+def get_json_dict_key(current_node_id, adjacent_node_id):
+  return current_node_id + ',' + adjacent_node_id
+
   
 
