@@ -6,6 +6,8 @@ from utils import get_json_dict_key
 
 def uniform_cost_search_no_constraint(g, dist, cost, source_id, destination_id):
 
+  nodes_explored_counter = 0
+
   pq = PriorityQueue() # by default Python implements a min pq
 
   dist_dict = {} # stores k:v pair of {node_id: distance from source}
@@ -21,12 +23,14 @@ def uniform_cost_search_no_constraint(g, dist, cost, source_id, destination_id):
   while not pq.empty():
 
     current_node = pq.get()
+    nodes_explored_counter += 1
 
     if current_node in visited:
       continue
     
     # NOTE: We only do goal test when we expand node not when we add to frontier
     if current_node.node_id == destination_id:
+      print(nodes_explored_counter)
       return current_node
 
     # mark node as visited
@@ -59,13 +63,3 @@ def uniform_cost_search_no_constraint(g, dist, cost, source_id, destination_id):
   return None
 
 #endof uniform cost search with no constraint satisfaction
-
-
-
-
-    
-
-    
-
-
-
