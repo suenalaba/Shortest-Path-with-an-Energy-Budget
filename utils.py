@@ -1,6 +1,5 @@
 import json
 from constants import LINE_DELIMITER, FILE_PATH
-
 # load in data files of JSON format
 def open_json_data():
 
@@ -23,13 +22,14 @@ def open_json_data():
   return g, dist, cost, coord
 
 # display results in console in format specified.
-def print_results(task_number,full_path_string, total_distance, total_energy_cost):
+def print_results(task_number,full_path_string, total_distance, total_energy_cost,nodes_explored):
   print(LINE_DELIMITER)
   print(task_number + " results: ")
   print(LINE_DELIMITER + "\n")
-  print("Shortest path: " + full_path_string + ".")
-  print("Shortest distance: " + str(total_distance) + ".")
-  print("Total energy cost: " + str(total_energy_cost) + ".")
+  print("Shortest path: " + full_path_string)
+  print("Shortest distance: " + str(total_distance))
+  print("Total energy cost: " + str(total_energy_cost))
+  print("Total nodes explored: " + str(nodes_explored))
 
 # getting the json key for both Cost and Dist dictionaries
 def get_json_dict_key(current_node_id, adjacent_node_id):
