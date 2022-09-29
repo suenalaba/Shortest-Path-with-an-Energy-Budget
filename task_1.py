@@ -3,13 +3,14 @@ import sys
 from Node import Node
 from utils import get_json_dict_key
 import math
+import heapq
 
 
 def astar_search_no_constraint(g, dist, cost, coord, source_id, destination_id):
 
   nodes_explored_counter = 0
 
-  pq = PriorityQueue() # by default Python implements a min pq
+  pq = [] # by default Python implements a min pq
 
   visited = [] # marker to indicate whether a node has been visited
 
@@ -18,13 +19,13 @@ def astar_search_no_constraint(g, dist, cost, coord, source_id, destination_id):
   dictOfNodes=dict()
   dictOfNodes[source_id]=source
 
-  pq.put(source)
+  heapq.heappush(pq,source)
 
-  while not pq.empty():
+  while len(pq)>0:
     #Pop node with the smallest heuristic
-    current_node = pq.get()
+    current_node = heapq.heappop(pq)
     nodes_explored_counter += 1
-    
+
     # NOTE: We only do goal test when we expand node not when we add to frontier
     if current_node.node_id == destination_id:
       return nodes_explored_counter,current_node
@@ -57,7 +58,7 @@ def astar_search_no_constraint(g, dist, cost, coord, source_id, destination_id):
             tempNode.cost = current_node.energy_cost + cost[cost_dict_key]
             tempNode.distance=distanceFromStart
             tempNode.heuristic=heuristic
-            pq.put(tempNode)
+            heapq.heapify(pq)
 
       else:
           # update energy cost
@@ -71,7 +72,7 @@ def astar_search_no_constraint(g, dist, cost, coord, source_id, destination_id):
           dictOfNodes[adjacent_node_id]=adjacent_node
 
           #Add node to priority queue
-          pq.put(adjacent_node)
+          heapq.heappush(pq,adjacent_node)
 
   # if path not found we return none. But for this specific instance, this should never happen.
   return None
