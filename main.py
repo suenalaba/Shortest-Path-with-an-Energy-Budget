@@ -22,6 +22,7 @@ def get_task1_results(g, dist, cost, coord):
   shortest_distance = destination_node.distance
   energy_cost = destination_node.energy_cost
   print_results("Task 1", path_as_string, shortest_distance, energy_cost,nodes_explored)
+  task1.uniform_cost_search_no_constraint(g, dist, cost, SOURCE, DESTINATION)
 
 def get_task2_results(g, dist, cost):
   nodes_explored,destination_node = task2.uniform_cost_search_with_constraint(g, dist, cost, SOURCE, DESTINATION)

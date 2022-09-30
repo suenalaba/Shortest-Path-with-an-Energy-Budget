@@ -4,10 +4,11 @@ from Node import Node
 from utils import get_json_dict_key
 import math
 import heapq
+from time import process_time
 
 
 def astar_search_no_constraint(g, dist, cost, coord, source_id, destination_id):
-
+  start = process_time()  
   nodes_explored_counter = 0
 
   pq = [] # by default Python implements a min pq
@@ -28,6 +29,8 @@ def astar_search_no_constraint(g, dist, cost, coord, source_id, destination_id):
 
     # NOTE: We only do goal test when we expand node not when we add to frontier
     if current_node.node_id == destination_id:
+      end = process_time()
+      print("Elapsed time in seconds for A*:", end-start)
       return nodes_explored_counter,current_node
 
     # mark node as visited
@@ -82,7 +85,8 @@ def astar_search_no_constraint(g, dist, cost, coord, source_id, destination_id):
 #endof Astar search with no constraint satisfaction
 
 def uniform_cost_search_no_constraint(g, dist, cost, source_id, destination_id):
-
+  start = process_time()  
+  nodes_explored_counter=0
   pq = PriorityQueue() # by default Python implements a min pq
 
   dist_dict = {} # stores k:v pair of {node_id: distance from source}
@@ -98,12 +102,16 @@ def uniform_cost_search_no_constraint(g, dist, cost, source_id, destination_id):
   while not pq.empty():
 
     current_node = pq.get()
+    nodes_explored_counter += 1
 
     if current_node in visited:
       continue
     
     # NOTE: We only do goal test when we expand node not when we add to frontier
     if current_node.node_id == destination_id:
+      end = process_time()
+      print("Elapsed time in seconds for uniform cost search:", end-start)
+      print("Nodes explored using uniform cost search:",nodes_explored_counter)
       return current_node
 
     # mark node as visited
