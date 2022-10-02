@@ -4,7 +4,6 @@ from utils import open_json_data, print_results
 import task_1 as task1
 import task_2 as task2
 import task_3 as task3
-import astar as astar
 from constants import SOURCE, DESTINATION
 from path_properties import get_printable_path
 
