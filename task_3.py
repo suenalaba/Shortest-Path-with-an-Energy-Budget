@@ -35,8 +35,7 @@ def astar_with_constraint(g, dist, cost, coord, source_id, destination_id):
     
     # NOTE: We only do goal test when we expand node not when we add to frontier
     if current_node.node_id == destination_id and current_node.energy_cost <= ENERGY_BUDGET:
-      print(nodes_explored_counter)
-      return current_node
+      return nodes_explored_counter,current_node
 
     for adjacent_node_id in g[current_node.node_id]:
 
