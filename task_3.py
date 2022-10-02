@@ -1,18 +1,25 @@
-import math
+from path_properties import heuristic
 from queue import PriorityQueue
 import sys
+from time import process_time
 from Node import Node
 from utils import get_json_dict_key
 from constants import ENERGY_BUDGET
 
 def astar_with_constraint(g, dist, cost, coord, source_id, destination_id):
 
+  start = process_time()
+
   nodes_explored_counter = 0
 
-  pq = PriorityQueue() # by default Python implements a min pq
+  frontier = PriorityQueue() # by default Python implements a min pq
 
-  dist_dict = {} # stores k:v pair of {node_id: distance from source}
-  dist_dict[source_id] = 0
+  source_hn = heuristic(coord, source_id, destination_id)
+
+  # f(n) = g(n) + h(n)
+  # eval_func = distance from start + Euclidean distance from node to destination
+  eval_func = {} # stores k:v pair of {node_id: eval func}
+  eval_func[source_id] = 0 + source_hn
 
   cost_dict = {} # stores K:v pair of {node_id: energy cost from source}
   cost_dict[source_id] = 0 
@@ -25,17 +32,19 @@ def astar_with_constraint(g, dist, cost, coord, source_id, destination_id):
   source = Node(source_id, 0, 0, None)
 
   # our PQ will have (f(n) score, node)
-  pq.put((0,source)) #can further tiebreak f(n) score with h(n)
+  frontier.put((0 + source_hn, source))
 
 
-  while not pq.empty():
+  while not frontier.empty():
 
-    fn, current_node = pq.get()
+    fn, current_node = frontier.get()
     nodes_explored_counter += 1
     
     # NOTE: We only do goal test when we expand node not when we add to frontier
     if current_node.node_id == destination_id and current_node.energy_cost <= ENERGY_BUDGET:
-      return nodes_explored_counter,current_node
+      end = process_time()
+      total_time = end - start
+      return total_time, nodes_explored_counter, current_node
 
     for adjacent_node_id in g[current_node.node_id]:
 
@@ -57,19 +66,17 @@ def astar_with_constraint(g, dist, cost, coord, source_id, destination_id):
       dist_dict_key = get_json_dict_key(current_node.node_id, adjacent_node_id)
       new_distance = current_node.distance + dist[dist_dict_key]
 
-      # we only want to add node to PQ if it has a shorter distance
+      new_hn = heuristic(coord, adjacent_node_id, destination_id)
+      new_fn = new_distance + new_hn
+
+      # we only want to add node to PQ if it has a lower f(n) or more energy efficient
       # if not present in dictionary means is NOT in so default give max value
       # because we will want to add this node
-
-      if new_distance < dist_dict.get(adjacent_node_id, sys.maxsize) or new_energy_cost < cost_dict.get(adjacent_node_id, sys.maxsize):
+      if new_fn < eval_func.get(adjacent_node_id, sys.maxsize) or new_energy_cost < cost_dict.get(adjacent_node_id, sys.maxsize):
         
-        # update cost_dict if a more energy efficient path is found
-        # if new_energy_cost < cost_dict.get(adjacent_node_id, sys.maxsize):
+        # update cost dict and eval_func dict if potential better path is found
         cost_dict[adjacent_node_id] = new_energy_cost
-
-        # update dist_dict if a shorter path is found
-        # if new_distance < dist_dict.get(adjacent_node_id, sys.maxsize):
-        dist_dict[adjacent_node_id] = new_distance
+        eval_func[adjacent_node_id] = new_fn
 
         # F(N) = g(n) + h(n) 
         new_hn = heuristic(coord, adjacent_node_id, destination_id)
@@ -78,16 +85,11 @@ def astar_with_constraint(g, dist, cost, coord, source_id, destination_id):
         # add node to frontier
         adjacent_node = Node(adjacent_node_id, new_distance, new_energy_cost, current_node)
 
-        # the pq comparator will be overloaded as defined in Node class.
-        pq.put((new_fn, adjacent_node))
+        # the frontier comparator will be overloaded as defined in Node class.
+        frontier.put((new_fn, adjacent_node))
 
   # if path not found we return none. But for this specific instance, this should never happen.
   return None
 
 #endof A* search with constraint satisfaction
 
-def heuristic(coord, current_node_id, destination_id):
-  xcurr, ycurr = coord[current_node_id]
-  xgoal, ygoal = coord[destination_id]
-  hn = math.sqrt((xgoal-xcurr)**2 + (ygoal-ycurr)**2)
-  return hn
