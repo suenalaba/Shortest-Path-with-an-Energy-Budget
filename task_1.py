@@ -23,11 +23,13 @@ def uniform_cost_search_no_constraint(g, dist, cost, source_id, destination_id):
   while not pq.empty():
 
     current_node = pq.get()
-    nodes_explored_counter += 1
+    
 
     if current_node in visited:
       continue
     
+    nodes_explored_counter += 1
+
     # NOTE: We only do goal test when we expand node not when we add to frontier
     if current_node.node_id == destination_id:
       print(nodes_explored_counter)
@@ -35,6 +37,8 @@ def uniform_cost_search_no_constraint(g, dist, cost, source_id, destination_id):
 
     # mark node as visited
     visited.append(current_node)
+
+
 
     for adjacent_node_id in g[current_node.node_id]:
 
