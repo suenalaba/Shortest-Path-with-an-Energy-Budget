@@ -1,8 +1,8 @@
 import os
 # General constants
 LINE_DELIMITER = "==================================================="
-path=os.getcwd()
-FILE_PATH =path+ "/data/"
+path = os.getcwd()
+FILE_PATH = path + "/data/"
 
 # Task specific constants
 SOURCE = "1"

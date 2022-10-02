@@ -1,3 +1,12 @@
+import math
+
+# this is the h(n) which is measured by Euclidean distance
+def heuristic(coord, current_node_id, destination_id):
+  xcurr, ycurr = coord[current_node_id]
+  xgoal, ygoal = coord[destination_id]
+  hn = math.sqrt((xgoal-xcurr)**2 + (ygoal-ycurr)**2)
+  return hn
+
 # this function builds the path by backtracking from destination node, using the parent variable
 def get_printable_path(destination_node):
   
